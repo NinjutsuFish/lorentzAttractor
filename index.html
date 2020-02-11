@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- /by leo harford 2019/2020* -->
+<style>
+body {
+  background: #FFFFFF;
+    color:red
+}
+//making canvas white + adding margin
+canvas {
+  background: #111;
+  padding: 0;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  display: block;
+}
+    
+</style>  
+</head>
+    
+<script src="windowhandler.js"></script>
+    
+<body>
+
+<h1 id="title" >Physics</h1><br>
+<h3> an attempt at making a physics tool by Leo Harford 2020</h3>
+<form id="options">
+<input type="checkbox" id="newNode" value="newNode"> tick box
+
+    
+</form>
+<br>
+<br>
+<script type="module">
+      import {
+        Renderer,
+        Camera,
+        Orbit,
+        Transform,
+        Geometry,
+        Vec3,
+        Color,
+        Polyline
+      } from "https://cdn.jsdelivr.net/npm/ogl@0.0.32/dist/ogl.mjs";
+
+      {
+        //class
+        var sigma = 10;
+        var rho = 28;
+        var beta = 2.66;
+        var dx = 0;
+        var dy = 0;
+        var dz = 0;
+        var x=3;
+        var y=11;
+        var z=2;
+        const renderer = new Renderer({ dpr: 2 });
+        const gl = renderer.gl;
+        document.body.appendChild(gl.canvas);
+        gl.clearColor(0.9, 0.9, 0.9, 1);
+
+        const camera = new Camera(gl);
+        camera.position.z = 3;
+
+        const controls = new Orbit(camera);
+
+        const scene = new Transform();
+
+        let polyline;
+
+        function resize() {
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+          if (polyline) polyline.resize();
+        }
+        window.addEventListener("resize", resize, false);
+
+        // Create an array of Vec3s (eg [[0, 0, 0], ...])
+        const count = 100;
+        const points = [];
+        points.push(new Vec3(x/100,y/100,z/100))
+        points.push(new Vec3(x/100,y/100,z/100))
+       // for (let i = 0; i < count; i++) {
+        //  const x = (i / (count - 1) - 0.5) * 3;
+        //  const y = Math.sin(i / 10.5) * 0.5;
+        //  const z = 0;
+
+        //  points.push(new Vec3(x, y, z));
+        //}
+        
+
+        polyline = new Polyline(gl, {
+          points,
+          uniforms: {
+            uColor: { value: new Color("#1b1b1b") },
+            uThickness: { value: 100 },
+            uMiter: { value: 0 }
+          }
+        });
+
+        polyline.mesh.setParent(scene);
+
+        // Call initial resize after creating the polyline to update its resolution uniforms
+        resize();
+
+        requestAnimationFrame(update);
+        function update(t) {
+        //updating dx,dy,dz
+            dx = sigma*(y-x);
+            dy = x*(rho-z)-y;
+            dz = (x*y)-(beta*z)
+            x+=dx/100;
+            z+=dz/100;
+            y+=dy/100;
+            console.log(x,y,z)
+            if(points.length<100){
+                points.push(new Vec3(x/100,y/100,z/100))
+            }else{
+                for (let i = 0; i < 99; i++){
+                    points[i] = points[i+1]
+                }
+                points[99] = new Vec3(x/10,y/10,z/10)
+                //console.log(points[0],points[10],points[99])
+                //alert("pause for leo")
+            }
+            //console.log(points)
+        polyline = new Polyline(gl, {
+          points,
+          uniforms: {
+            uColor: { value: new Color("#1b1b1b") },
+            uThickness: { value: 2 },
+            uMiter: { value: 0 }
+          }
+        });
+
+        polyline.mesh.setParent(scene);
+
+        // Call initial resize after creating the polyline to update its resolution uniforms
+        resize();
+          requestAnimationFrame(update);
+          controls.update();
+          renderer.render({ scene, camera });
+        }
+      }
+    </script>
+    
+</body>
+</html>
