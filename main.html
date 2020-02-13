@@ -23,8 +23,8 @@ canvas {
     
 <body>
 
-<h1 id="title" >Physics</h1><br>
-<h3> an attempt at making a physics tool by Leo Harford 2020</h3>
+<h1 id="title" >Lorenz Attractor</h1><br>
+<h3> lorenz attractor</h3>
 <form id="options">
 <input type="checkbox" id="newNode" value="newNode"> tick box
 
@@ -90,16 +90,6 @@ canvas {
         //}
         
 
-        polyline = new Polyline(gl, {
-          points,
-          uniforms: {
-            uColor: { value: new Color("#1b1b1b") },
-            uThickness: { value: 100 },
-            uMiter: { value: 0 }
-          }
-        });
-
-        polyline.mesh.setParent(scene);
 
         // Call initial resize after creating the polyline to update its resolution uniforms
         resize();
@@ -125,6 +115,7 @@ canvas {
                 //alert("pause for leo")
             }
             //console.log(points)
+        var scene = new Transform();
         polyline = new Polyline(gl, {
           points,
           uniforms: {
